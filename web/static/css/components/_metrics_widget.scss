@@ -1,0 +1,18 @@
+.metrics-widget {
+  width: percentage(1/7);
+  float: left;
+  text-align: center;
+  padding: 0.5rem;
+  margin: 1rem;
+  border-radius: 0.25rem;
+  background-color: rgb(74, 174, 249);
+}
+
+.metrics-header {
+  font-weight: 400;
+  font-size: 4rem;
+}
+
+.metrics-value {
+  font-size: 2rem;
+}
