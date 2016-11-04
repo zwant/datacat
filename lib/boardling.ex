@@ -9,9 +9,8 @@ defmodule Boardling do
     children = [
       # Start the endpoint when the application starts
       supervisor(Boardling.Endpoint, []),
-      worker(Boardling.Scheduler, [])
-      # Here you could define other workers and supervisors as children
-      # worker(Boardling.Worker, [arg1, arg2, arg3]),
+      worker(Boardling.Scheduler, [Boardling.Scheduler]),
+      worker(Boardling.Subscriber, [Boardling.Subscriber]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

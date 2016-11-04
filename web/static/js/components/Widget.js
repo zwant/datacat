@@ -2,8 +2,9 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
 const Widget = ({theName, theValue}) => (
-  <div>
-    <h2> Name: { theName } Value: { theValue } </h2>
+  <div className="metrics-widget">
+    <div className="metrics-header"> { theName } </div>
+    <div className="metrics-value"> { theValue } </div>
   </div>
 )
 
