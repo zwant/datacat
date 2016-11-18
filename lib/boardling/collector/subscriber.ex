@@ -11,8 +11,7 @@ defmodule Boardling.Subscriber do
     {:ok, state}
   end
 
-  def handle_info(%{event: event, payload: payload} = msg, state) do
-    %{name: name, value: value} = payload
+  def handle_info(%{event: event, payload: %{name: name, value: value}}, state) do
     Boardling.MetricsChannel.broadcast_metric name, value
     {:noreply, state}
   end

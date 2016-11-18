@@ -8,14 +8,46 @@ defmodule Boardling do
 
     children = [
       # Start the endpoint when the application starts
-      supervisor(Boardling.Endpoint, []),
-      worker(Boardling.Scheduler, [Boardling.Scheduler]),
-      worker(Boardling.Subscriber, [Boardling.Subscriber]),
+      supervisor(Boardling.Endpoint, [])
     ]
-
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Boardling.Supervisor]
+    Supervisor.start_link(children, opts)
+
+    init_event_subscribers
+    init_zmq_handlers
+    init_example
+  end
+
+  defp init_example() do
+    import Supervisor.Spec, warn: false
+
+    children = [
+      worker(Boardling.ExampleZmqClient, [Boardling.ExampleZmqClient])
+    ]
+    opts = [strategy: :one_for_one, name: Boardling.ExampleSupervisor]
+    Supervisor.start_link(children, opts)
+  end
+
+  defp init_zmq_handlers() do
+    import Supervisor.Spec, warn: false
+
+    children = [
+      worker(Boardling.ZmqEventReceiver, [Boardling.ZmqEventReceiver]),
+      worker(Boardling.ZmqScheduler, [Boardling.ZmqScheduler]),
+    ]
+    opts = [strategy: :one_for_one, name: Boardling.ZmqHandlerSupervisor]
+    Supervisor.start_link(children, opts)
+  end
+
+  defp init_event_subscribers() do
+    import Supervisor.Spec, warn: false
+
+    children = [
+      worker(Boardling.Subscriber, [Boardling.Subscriber])
+    ]
+    opts = [strategy: :one_for_one, name: Boardling.EventSubscriberSupervisor]
     Supervisor.start_link(children, opts)
   end
 
