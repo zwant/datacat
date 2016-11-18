@@ -1,8 +1,6 @@
-defmodule Boardling.Scheduler do
+defmodule Boardling.ZmqScheduler do
   use GenServer
-  require Boardling.Endpoint
   require Logger
-  require Phoenix.PubSub
 
   def start_link(name \\ nil) do
     GenServer.start_link(__MODULE__, nil, [name: name])
@@ -10,12 +8,13 @@ defmodule Boardling.Scheduler do
 
   def init(state) do
     schedule_work() # Schedule work to be performed at some point
-    {:ok, state}
+    {:ok, socket} = Exzmq.start([{:type, :pub}])
+    Exzmq.bind(socket, :tcp, 5555, [])
+    {:ok, %{socket: socket}}
   end
 
   def handle_info(:work, state) do
-    Boardling.Endpoint.broadcast! "metrics:incoming", "new_metric", %{name: "hej", value: :rand.uniform}
-    Boardling.Endpoint.broadcast! "metrics:incoming", "new_metric", %{name: "hej2", value: :rand.uniform}
+    Exzmq.send(state.socket, [<<"Hello",0>>])
     schedule_work() # Reschedule once more
     {:noreply, state}
   end
