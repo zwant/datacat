@@ -7,14 +7,15 @@ defmodule Boardling.ZmqScheduler do
   end
 
   def init(state) do
+    {:ok, ctx} = :czmq.start_link()
+    socket = :czmq.zsocket_new(ctx, :czmq_const.zmq_pub)
+    {:ok, port} = :czmq.zsocket_bind(socket, "tcp://localhost:5555")
     schedule_work() # Schedule work to be performed at some point
-    {:ok, socket} = Exzmq.start([{:type, :pub}])
-    Exzmq.bind(socket, :tcp, 5555, [])
     {:ok, %{socket: socket}}
   end
 
   def handle_info(:work, state) do
-    Exzmq.send(state.socket, [<<"Hello",0>>])
+    :czmq.zstr_send(socket, "schedule hello")
     schedule_work() # Reschedule once more
     {:noreply, state}
   end
