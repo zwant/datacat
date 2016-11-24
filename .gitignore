@@ -24,3 +24,5 @@ erl_crash.dump
 /config/prod.secret.exs
 *.swp
 .DS_Store
+
+example_collectors/python/env/

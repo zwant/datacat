@@ -8,8 +8,10 @@ defmodule Boardling.ZmqEventReceiver do
   end
 
   def init(state) do
-    {:ok, socket} = Exzmq.start([{:type, :sub}])
-    Exzmq.bind(socket, :tcp, 5556, [])
+    {:ok, ctx} = :czmq.start_link()
+    socket = :czmq.zsocket_new(ctx, :czmq_const.zmq_sub)
+    {:ok, port} = :czmq.zsocket_bind(socket, "tcp://localhost:5556")
+    :czmq.zsocket_set_subscribe(socket, "metrics" |> String.to_char_list)
     Process.send_after(self(), :work, 1000) # In one second
     {:ok, %{socket: socket}}
   end
@@ -19,14 +21,14 @@ defmodule Boardling.ZmqEventReceiver do
   end
 
   defp receive_loop(socket) do
-    {:ok, r} = Exzmq.recv(socket)
-    case Poison.decode(r, as: %MetricEvent{}) do
+    {:ok, msg} = :czmq.zstr_recv(socket)
+    case Poison.decode(msg, as: %MetricEvent{}) do
       {:ok, metric} ->
         Logger.debug "Received new metric: name: #{metric.name}, value: #{metric.value}"
         Boardling.Endpoint.broadcast! "metrics:incoming", "new_metric", %{name: metric.name,
                                                                           value: metric.value}
 
-      {:error, {error_type, where}} -> Logger.error "JSON Parse error #{error_type} at #{where} for message #{r}"
+      {:error, {error_type, where}} -> Logger.error "JSON Parse error #{error_type} at #{where} for message #{msg}"
     end
     receive_loop(socket)
   end
