@@ -25,4 +25,6 @@ erl_crash.dump
 *.swp
 .DS_Store
 
+# Python stuff
 example_collectors/python/env/
+*.pyc
