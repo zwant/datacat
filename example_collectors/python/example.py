@@ -1,30 +1,13 @@
-import time
+from boardling_collector import BoardlingCollector, Metric
 import random
-import zmq
-import json
+
+def collect():
+    return [Metric(name="python-collector-{}".format(i),
+                  value=random.uniform(0, 100)) for i in range(1,2)]
 
 def main():
-    context = zmq.Context()
-    # First, connect our subscriber socket
-    subscriber = context.socket(zmq.SUB)
-    subscriber.connect('tcp://127.0.0.1:5555')
-    subscriber.setsockopt(zmq.SUBSCRIBE, b'')
+    BoardlingCollector("example").run(collect)
 
-    # First, connect our publish socket
-    publisher = context.socket(zmq.PUB)
-    publisher.connect('tcp://127.0.0.1:5556')
-
-    while True:
-        time.sleep(2)
-        #subscriber.recv()
-        data = {
-            "name": "My Python Script",
-            "value": random.uniform(0, 100)
-        }
-        print "Sending {}".format(data)
-
-        result = publisher.send(json.dumps(data) + "\n")
-        print result
 
 if __name__ == "__main__":
     main()

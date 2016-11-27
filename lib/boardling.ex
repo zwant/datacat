@@ -17,17 +17,6 @@ defmodule Boardling do
 
     init_event_subscribers
     init_zmq_handlers
-    init_example
-  end
-
-  defp init_example() do
-    import Supervisor.Spec, warn: false
-
-    children = [
-      worker(Boardling.ExampleZmqClient, [Boardling.ExampleZmqClient])
-    ]
-    opts = [strategy: :one_for_one, name: Boardling.ExampleSupervisor]
-    Supervisor.start_link(children, opts)
   end
 
   defp init_zmq_handlers() do
