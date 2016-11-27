@@ -17,7 +17,7 @@ defmodule Boardling.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Boardling, []},
-     applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext, :exzmq]]
+     applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext]]
   end
 
   # Specifies which paths to compile per environment.
@@ -28,11 +28,13 @@ defmodule Boardling.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    [{:phoenix, "~> 1.1.3"},
-     {:phoenix_html, "~> 2.3"},
-     {:phoenix_live_reload, "~> 1.0", only: :dev},
-     {:gettext, "~> 0.9"},
-     {:cowboy, "~> 1.0"},
-     {:exzmq, git: "https://github.com/ppold/exzmq"}]
+    [
+      {:phoenix, "~> 1.1.3"},
+      {:phoenix_html, "~> 2.3"},
+      {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:gettext, "~> 0.9"},
+      {:cowboy, "~> 1.0"},
+      {:czmq, github: "gar1t/erlang-czmq", compile: "./configure; make"}
+   ]
   end
 end
