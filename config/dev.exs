@@ -12,7 +12,7 @@ config :boardling, Boardling.Endpoint,
   code_reloader: true,
   cache_static_lookup: false,
   check_origin: false,
-  watchers: [node: ["node_modules/webpack/bin/webpack.js", "--watch", "--color", "--progress"]]
+  watchers: [npm: ["run", "watch", cd: Path.expand("../", __DIR__)]]
 
 # Watch static and templates for browser reloading.
 config :boardling, Boardling.Endpoint,
