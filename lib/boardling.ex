@@ -15,28 +15,16 @@ defmodule Boardling do
     opts = [strategy: :one_for_one, name: Boardling.Supervisor]
     Supervisor.start_link(children, opts)
 
-    init_event_subscribers
-    init_zmq_handlers
+    init_scheduler
   end
 
-  defp init_zmq_handlers() do
+  defp init_scheduler() do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Boardling.ZmqEventReceiver, [Boardling.ZmqEventReceiver]),
-      worker(Boardling.ZmqScheduler, [Boardling.ZmqScheduler]),
+      worker(Boardling.Scheduler, [Boardling.Scheduler]),
     ]
-    opts = [strategy: :one_for_one, name: Boardling.ZmqHandlerSupervisor]
-    Supervisor.start_link(children, opts)
-  end
-
-  defp init_event_subscribers() do
-    import Supervisor.Spec, warn: false
-
-    children = [
-      worker(Boardling.Subscriber, [Boardling.Subscriber])
-    ]
-    opts = [strategy: :one_for_one, name: Boardling.EventSubscriberSupervisor]
+    opts = [strategy: :one_for_one, name: Boardling.SchedulerSupervisor]
     Supervisor.start_link(children, opts)
   end
 

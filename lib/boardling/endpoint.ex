@@ -1,7 +1,8 @@
 defmodule Boardling.Endpoint do
   use Phoenix.Endpoint, otp_app: :boardling
 
-  socket "/socket", Boardling.WidgetSocket
+  socket "/widget_socket", Boardling.WidgetSocket
+  socket "/collector_socket", Boardling.CollectorSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #

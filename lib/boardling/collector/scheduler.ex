@@ -1,23 +1,20 @@
-defmodule Boardling.ZmqScheduler do
+defmodule Boardling.Scheduler do
+  alias Boardling.CollectorChannel
   use GenServer
   require Logger
-
-  @topic "schedule:"
 
   def start_link(name \\ nil) do
     GenServer.start_link(__MODULE__, nil, [name: name])
   end
 
   def init(state) do
-    {:ok, ctx} = :czmq.start_link()
-    socket = :czmq.zsocket_new(ctx, :czmq_const.zmq_pub)
-    {:ok, _port} = :czmq.zsocket_bind(socket, "tcp://*:5555")
-    schedule_work() # Schedule work to be performed at some point
-    {:ok, %{socket: socket}}
+    schedule_work
+    {:ok, state}
   end
 
   def handle_info(:work, state) do
-    :czmq.zstr_send(state.socket, "#{@topic}hello")
+    Logger.debug("Scheduling...")
+    CollectorChannel.broadcast_schedulation "example"
     schedule_work() # Reschedule once more
     {:noreply, state}
   end
