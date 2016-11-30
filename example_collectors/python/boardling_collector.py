@@ -1,5 +1,4 @@
-import asyncio
-import websockets
+from ws4py.client.threadedclient import WebSocketClient
 import json
 
 
@@ -13,7 +12,54 @@ class Metric(object):
     def __repr__(self):
         return "Metric[name: {}, value: {}]".format(self.name, self.value)
 
+class _CollectorClient(WebSocketClient):
+    topic = None
+    collector_func = None # Needs to be set by creator
+    collector_id = None
+
+    def __init__(self, url, collector_id, collector_func, protocols=None, extensions=None, heartbeat_freq=None,
+    ssl_options=None, headers=None):
+        super().__init__(url, protocols=protocols, extensions=extensions, heartbeat_freq=heartbeat_freq, ssl_options=ssl_options, headers=headers)
+        self.collector_id = collector_id
+        self.collector_func = collector_func
+        self.topic = "metrics_collectors:{}".format(collector_id)
+
+    def opened(self):
+        data = dict(topic=topic, event="phx_join", payload={}, ref=None)
+        self.send(json.dumps(data))
+        print("Joined")
+
+        def received_message(self, msg):
+            json_msg_received = json.loads(msg)
+            print("Got msg: {}".format(msg))
+
+            collector_return = self.collector_func()
+            if not _validate_return_value(collector_return):
+                print("Invalid return value from collector: {}".format(collector_return))
+                return
+
+                all_data = []
+                try:
+                    iterator = iter(collector_return)
+                except TypeError:
+                    # Not iterable
+                    all_data.append(json.dumps({"name": collector_return.name,
+                    "value": collector_return.value}))
+                else:
+                    # iterable
+                    all_data.extend([json.dumps({"name": returned.name,
+                    "value": returned.value}) for returned in collector_return])
+
+                    for piece_of_data in all_data:
+                        msg = dict(topic=topic,
+                        event="new",
+                        payload={"body":piece_of_data}, ref=None)
+                        self.send(json.dumps(msg))
+
+                        print("Sent {}".format(msg))
+
 class BoardlingCollector(object):
+
     collector_id = None
     websocket_url = None
 
@@ -28,8 +74,16 @@ class BoardlingCollector(object):
 
 
     def run(self, collector_func):
-        asyncio.get_event_loop().run_until_complete(_run_listen(collector_func, self.collector_id, self.websocket_url))
-        asyncio.get_event_loop().run_forever()
+        try:
+            ws = _CollectorClient(self.websocket_url,
+                                  self.collector_id,
+                                  collector_func,
+                                  protocols=['http-only', 'chat'])
+            ws.connect()
+            ws.run_forever()
+        except KeyboardInterrupt:
+            ws.close()
+
 
 def _validate_return_value(return_value):
     """
@@ -49,41 +103,3 @@ def _validate_return_value(return_value):
     except AttributeError as e:
         return False
     return True
-
-async def _run_listen(collector_func, collector_id, websocket_url):
-    topic = "metrics_collectors:{}".format(collector_id)
-
-    async with websockets.connect(websocket_url) as websocket:
-        data = dict(topic=topic, event="phx_join", payload={}, ref=None)
-        await websocket.send(json.dumps(data))
-        print("Joined")
-
-        while True:
-            call = await websocket.recv()
-            json_msg_received = json.loads(call)
-            print("Got msg: {}".format(call))
-
-            collector_return = collector_func()
-            if not _validate_return_value(collector_return):
-                print("Invalid return value from collector: {}".format(collector_return))
-                continue
-
-            all_data = []
-            try:
-                iterator = iter(collector_return)
-            except TypeError:
-                # Not iterable
-                all_data.append(json.dumps({"name": collector_return.name,
-                                   "value": collector_return.value}))
-            else:
-                # iterable
-                all_data.extend([json.dumps({"name": returned.name,
-                                    "value": returned.value}) for returned in collector_return])
-
-            for piece_of_data in all_data:
-                msg = dict(topic=topic,
-                           event="new",
-                           payload={"body":piece_of_data}, ref=None)
-                await websocket.send(json.dumps(msg))
-
-                print("Sent {}".format(msg))
