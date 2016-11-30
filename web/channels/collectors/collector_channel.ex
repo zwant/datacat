@@ -8,8 +8,13 @@ defmodule Boardling.CollectorChannel do
   end
 
   def handle_in("new", %{"body" => body}, socket) do
-    Poison.decode!(body, as: %MetricEvent{})
-      |> Boardling.OutgoingMetricsChannel.broadcast_metric
+    case Poison.decode(body, as: %MetricEvent{}) do
+      {:ok, event} ->
+        Logger.debug("Received metric #{inspect event}")
+        Boardling.OutgoingMetricsChannel.broadcast_metric event
+      {:error, _} ->
+        Logger.warn("Received invalid JSON: #{body}")
+    end
     {:noreply, socket}
   end
 
