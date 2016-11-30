@@ -33,8 +33,7 @@ defmodule Boardling.Mixfile do
       {:phoenix_html, "~> 2.3"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.9"},
-      {:cowboy, "~> 1.0"},
-      {:czmq, github: "gar1t/erlang-czmq", compile: "./configure; make"}
+      {:cowboy, "~> 1.0"}
    ]
   end
 end

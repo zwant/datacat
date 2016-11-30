@@ -1,8 +1,8 @@
-defmodule Boardling.WidgetSocket do
+defmodule Boardling.CollectorSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "outgoing_metrics:*", Boardling.OutgoingMetricsChannel
+  channel "metrics_collectors:*", Boardling.CollectorChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
