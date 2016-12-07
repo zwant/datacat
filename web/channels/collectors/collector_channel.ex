@@ -1,9 +1,11 @@
 defmodule Boardling.CollectorChannel do
   alias Boardling.MetricEvent
+  alias Boardling.CollectorManager
   use Phoenix.Channel
   require Logger
 
-  def join("metrics_collectors:" <> _collector_name, _message, socket) do
+  def join("metrics_collectors:" <> collector_name, _message, socket) do
+    CollectorManager.add_collector(collector_name)
     {:ok, socket}
   end
 
@@ -19,6 +21,7 @@ defmodule Boardling.CollectorChannel do
   end
 
   def broadcast_schedulation(collector_name) do
+    Logger.info "Running schedulation for [#{collector_name}]"
     Boardling.Endpoint.broadcast_from! self(), "metrics_collectors:#{collector_name}", "schedule", %{}
   end
 end

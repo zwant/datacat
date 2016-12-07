@@ -19,8 +19,13 @@ defmodule Boardling.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Boardling do
-  #   pipe_through :api
-  # end
+  scope "/api", Boardling do
+    pipe_through :api
+
+    get "/collectors/:name", CollectorController, :show
+    put "/collectors/:name/schedule", CollectorController, :update_schedule
+    put "/collectors/:name/activate", CollectorController, :activate
+    put "/collectors/:name/deactivate", CollectorController, :deactivate
+    get "/collectors", CollectorController, :list
+  end
 end

@@ -15,17 +15,6 @@ defmodule Boardling do
     opts = [strategy: :one_for_one, name: Boardling.Supervisor]
     Supervisor.start_link(children, opts)
 
-    init_scheduler
-  end
-
-  defp init_scheduler() do
-    import Supervisor.Spec, warn: false
-
-    children = [
-      worker(Boardling.Scheduler, [Boardling.Scheduler]),
-    ]
-    opts = [strategy: :one_for_one, name: Boardling.SchedulerSupervisor]
-    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration
