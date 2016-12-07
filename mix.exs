@@ -17,7 +17,7 @@ defmodule Boardling.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Boardling, []},
-     applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext]]
+     applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext, :quantum]]
   end
 
   # Specifies which paths to compile per environment.
@@ -33,7 +33,9 @@ defmodule Boardling.Mixfile do
       {:phoenix_html, "~> 2.3"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.9"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:amnesia, "~> 0.2.5"},
+      {:quantum, ">= 1.8.1"}
    ]
   end
 end
