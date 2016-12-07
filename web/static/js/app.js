@@ -11,17 +11,39 @@
 //
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
-import "phoenix_html"
-import { render } from 'react-dom'
+import 'babel-polyfill'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
+import { List, Map } from 'immutable'
+import { createStore, applyMiddleware } from 'redux'
+import thunkMiddleware from 'redux-thunk'
+import createLogger from 'redux-logger'
 import App from './components/App'
-import configureStore from './store/configureStore'
+import rootReducer from './reducers'
+import { init as websocketInit, emit } from './actions/websocket'
 
-let store = configureStore()
+const initialState = new Map()
+  .set('messages', new List())
+  .set('users', new List())
+  .set('userIdsTyping', new Map())
+  .set('currentUser', new Map())
+  .set('currentUserIsTyping', false)
 
-render(
-  <Provider store={store}>
+function startUp () {
+  const middleware = [ thunkMiddleware.withExtraArgument({ emit }) ]
+  middleware.push(createLogger())
+
+  const setup = applyMiddleware(...middleware)(createStore)
+
+  const store = setup(rootReducer, initialState)
+  websocketInit(store) // setup websocket listeners etc
+
+  return store
+}
+
+ReactDOM.render(
+  <Provider store={startUp()}>
     <App />
   </Provider>,
   document.getElementById('root')

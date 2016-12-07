@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import WidgetGrid from '../components/WidgetGrid'
+import WidgetGrid from '../components/widgets/WidgetGrid'
 
 const mapStateToProps = (state) => {
   return {metrics: state.metrics}
