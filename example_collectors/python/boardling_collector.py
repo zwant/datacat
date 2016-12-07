@@ -17,46 +17,84 @@ class _CollectorClient(WebSocketClient):
     collector_func = None # Needs to be set by creator
     collector_id = None
 
-    def __init__(self, url, collector_id, collector_func, protocols=None, extensions=None, heartbeat_freq=None,
-    ssl_options=None, headers=None):
-        super().__init__(url, protocols=protocols, extensions=extensions, heartbeat_freq=heartbeat_freq, ssl_options=ssl_options, headers=headers)
+    def __init__(self,
+                 url,
+                 collector_id,
+                 collector_func,
+                 protocols=None,
+                 extensions=None,
+                 heartbeat_freq=None,
+                 ssl_options=None,
+                 headers=None):
+        super().__init__(url,
+                         protocols=protocols,
+                         extensions=extensions,
+                         heartbeat_freq=heartbeat_freq,
+                         ssl_options=ssl_options,
+                         headers=headers)
         self.collector_id = collector_id
         self.collector_func = collector_func
         self.topic = "metrics_collectors:{}".format(collector_id)
 
     def opened(self):
-        data = dict(topic=topic, event="phx_join", payload={}, ref=None)
+        data = dict(topic=self.topic, event="phx_join", payload={}, ref=None)
         self.send(json.dumps(data))
         print("Joined")
 
-        def received_message(self, msg):
-            json_msg_received = json.loads(msg)
-            print("Got msg: {}".format(msg))
+    def _is_schedule_event(self, json_msg):
+        return 'event' in json_msg and json_msg['event'] == 'schedule'
 
-            collector_return = self.collector_func()
-            if not _validate_return_value(collector_return):
-                print("Invalid return value from collector: {}".format(collector_return))
-                return
+    def _validate_return_value(self, return_value):
+        """
+        Return value should either be something iterable, where every value
+        is a Metric, or it should just be a Metric
+        """
+        try:
+            try:
+                iterator = iter(return_value)
+            except TypeError:
+                return_value.name
+                return_value.value
+            else:
+                for thing in iterator:
+                    thing.name
+                    thing.value
+        except AttributeError as e:
+            return False
+        return True
 
-                all_data = []
-                try:
-                    iterator = iter(collector_return)
-                except TypeError:
-                    # Not iterable
-                    all_data.append(json.dumps({"name": collector_return.name,
-                    "value": collector_return.value}))
-                else:
-                    # iterable
-                    all_data.extend([json.dumps({"name": returned.name,
-                    "value": returned.value}) for returned in collector_return])
+    def received_message(self, raw_msg):
+        msg = str(raw_msg.data, encoding='utf-8')
+        print("Got msg: {}".format(msg))
+        json_msg_received = json.loads(msg)
 
-                    for piece_of_data in all_data:
-                        msg = dict(topic=topic,
-                        event="new",
-                        payload={"body":piece_of_data}, ref=None)
-                        self.send(json.dumps(msg))
+        if not self._is_schedule_event(json_msg_received):
+            return
 
-                        print("Sent {}".format(msg))
+        collector_return = self.collector_func()
+        if not self._validate_return_value(collector_return):
+            print("Invalid return value from collector: {}".format(collector_return))
+            return
+
+        all_data = []
+        try:
+            iterator = iter(collector_return)
+        except TypeError:
+            # Not iterable
+            all_data.append(json.dumps({"name": collector_return.name,
+            "value": collector_return.value}))
+        else:
+            # iterable
+            all_data.extend([json.dumps({"name": returned.name,
+            "value": returned.value}) for returned in collector_return])
+
+            for piece_of_data in all_data:
+                outgoing_msg = dict(topic=self.topic,
+                event="new",
+                payload={"body":piece_of_data}, ref=None)
+                self.send(json.dumps(outgoing_msg))
+
+                print("Sent {}".format(outgoing_msg))
 
 class BoardlingCollector(object):
 
@@ -83,23 +121,3 @@ class BoardlingCollector(object):
             ws.run_forever()
         except KeyboardInterrupt:
             ws.close()
-
-
-def _validate_return_value(return_value):
-    """
-    Return value should either be something iterable, where every value
-    is a Metric, or it should just be a Metric
-    """
-    try:
-        try:
-            iterator = iter(return_value)
-        except TypeError:
-            return_value.name
-            return_value.value
-        else:
-            for thing in iterator:
-                thing.name
-                thing.value
-    except AttributeError as e:
-        return False
-    return True
