@@ -1,1 +1,1 @@
-export const messageSendRequested = 'messageSendRequested'
+export const collectorListRequested = 'collectorListRequested'
