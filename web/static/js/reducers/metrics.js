@@ -1,8 +1,8 @@
-import { newMetric } from '../config'
+import { messageTypes } from '../config'
 
 const metrics = (state = {}, action) => {
-  if (action.type === newMetric) {
-    return { ...state, [action.metricName]: action.theValue }
+  if (action.type === messageTypes.new_metric) {
+    return { ...state, [action.payload.name]: action.payload.value }
   }
   return state
 }
