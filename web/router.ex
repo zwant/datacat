@@ -22,10 +22,11 @@ defmodule Boardling.Router do
   scope "/api", Boardling do
     pipe_through :api
 
+    get "/collectors", CollectorController, :list
     get "/collectors/:name", CollectorController, :show
+    post "/collectors/:name/run_now", CollectorController, :run_now
     put "/collectors/:name/schedule", CollectorController, :update_schedule
     put "/collectors/:name/activate", CollectorController, :activate
     put "/collectors/:name/deactivate", CollectorController, :deactivate
-    get "/collectors", CollectorController, :list
   end
 end
