@@ -29,6 +29,13 @@ defmodule Boardling.CollectorController do
       |> json(CollectorManager.list_collectors)
   end
 
+  def run_now(conn, %{"name" => name}) do
+    CollectorManager.run_now(name)
+    conn
+      |> put_status(200)
+      |> json(%{ok: true})
+  end
+
   def show(conn, %{"name" => name}) do
     case CollectorManager.get_collector(name) do
       collector when not is_nil(collector) -> conn |> put_status(200) |> json(collector)
