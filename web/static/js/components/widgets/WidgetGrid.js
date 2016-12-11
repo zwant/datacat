@@ -1,21 +1,27 @@
-import React, { PropTypes } from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import Radium from 'radium'
 import Widget from './Widget'
 
-const WidgetGrid = ({metrics}) => (
-  <ul>
-    {Object.keys(metrics).map(metricName =>
-      <Widget
-        key={metricName}
-        theName={metricName}
-        theValue={metrics[metricName]}
-      />
-    )}
-  </ul>
-)
+export default Radium((props) => {
+  const { metrics } = props
+  let metricsUi = null
 
-WidgetGrid.propTypes = {
-  metrics: PropTypes.object.isRequired
-}
+  console.log(metrics)
+  if (metrics.size > 0) {
+    metricsUi = props.metrics.entrySeq().map( ([key, value]) => {
+      return (
+        <Widget
+          key={key}
+          name={key}
+          value={value}
+        />
+      )
+    })
+  }
 
-export default WidgetGrid
+  return (
+    <ul>
+      {metricsUi}
+    </ul>
+  )
+})

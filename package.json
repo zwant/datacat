@@ -4,6 +4,8 @@
     "babel-polyfill": "^6.16.0",
     "classnames": "^2.2.5",
     "immutable": "^3.8.1",
+    "lodash.bind": "^4.2.1",
+    "radium": "^0.18.1",
     "react": "^0.14.6",
     "react-bootstrap": "^0.28.2",
     "react-dom": "^0.14.6",

@@ -1,47 +1,54 @@
-// Brunch automatically concatenates all files in your
-// watched paths. Those paths can be configured at
-// config.paths.watched in "brunch-config.js".
-//
-// However, those files will only be executed if
-// explicitly imported. The only exception are files
-// in vendor, which are never wrapped in imports and
-// therefore are always executed.
+import React, { Component } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import Radium from 'radium'
+import * as actions from './actions'
+import bind from 'lodash.bind'
 
-// Import dependencies
-//
-// If you no longer want to use a dependency, remember
-// to also remove its path from "config.paths.watched".
-import 'babel-polyfill'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import { List, Map } from 'immutable'
-import { createStore, applyMiddleware } from 'redux'
-import thunkMiddleware from 'redux-thunk'
-import createLogger from 'redux-logger'
-import App from './components/App'
-import rootReducer from './reducers'
-import { init as websocketInit, emit } from './actions/websocket'
+import WidgetGrid from './components/widgets/WidgetGrid'
 
-const initialState = {
-  metrics: {}
+class App extends Component {
+  constructor (props) {
+    super(props)
+
+    // this.getComponentList = bind(this.getComponentList, this)
+  }
+
+  componentWillMount () {
+    this.props.actions.startUp()
+  }
+
+  // join (name) {
+  //   this.props.actions.join(name)
+  // }
+
+  render () {
+    const { collectors, metrics } = this.props
+
+    return (
+      <div>
+        <WidgetGrid
+          metrics={metrics}/>
+      </div>
+    )
+  }
 }
 
-function startUp () {
-  const middleware = [ thunkMiddleware.withExtraArgument({ emit }) ]
-  middleware.push(createLogger())
-
-  const setup = applyMiddleware(...middleware)(createStore)
-
-  const store = setup(rootReducer, initialState)
-  websocketInit(store) // setup websocket listeners etc
-
-  return store
+function mapStateToProps (state) {
+  return {
+    collectors: state.collectors,
+    metrics: state.metrics
+  }
 }
 
-ReactDOM.render(
-  <Provider store={startUp()}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-)
+function mapDispatchToProps (dispatch) {
+  return {
+    dispatch: dispatch,
+    actions: bindActionCreators(actions, dispatch)
+  }
+}
+
+export default Radium(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App))

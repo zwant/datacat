@@ -19,9 +19,6 @@ const init = (store) => {
         store.dispatch({ type, payload })
       })}
     )
-
-  // Load the list of components
-  store.dispatch({ type: actionTypes.collectorListRequested })
 }
 
 const emit = (type, payload) => {
