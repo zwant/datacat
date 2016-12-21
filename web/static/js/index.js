@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { List, Map } from 'immutable'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import createLogger from 'redux-logger'
 import App from './App'
@@ -16,10 +16,12 @@ const initialState = {
 }
 
 function startUp () {
-  const middleware = [ thunkMiddleware.withExtraArgument({ emit }) ]
-  middleware.push(createLogger())
+  const middleware = [
+    thunkMiddleware.withExtraArgument({ emit }),
+    createLogger()
+  ]
 
-  const setup = applyMiddleware(...middleware)(createStore)
+  const setup = compose(applyMiddleware(...middleware))(createStore)
 
   const store = setup(rootReducer, initialState)
   websocketInit(store) // setup websocket listeners etc

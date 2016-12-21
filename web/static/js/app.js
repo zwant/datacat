@@ -5,7 +5,7 @@ import Radium from 'radium'
 import * as actions from './actions'
 import bind from 'lodash.bind'
 
-import WidgetGrid from './components/widgets/WidgetGrid'
+import Dashboard from './components/Dashboard'
 
 class App extends Component {
   constructor (props) {
@@ -23,12 +23,11 @@ class App extends Component {
   // }
 
   render () {
-    const { collectors, metrics } = this.props
+    const { layout, widgets } = this.props
 
     return (
       <div>
-        <WidgetGrid
-          metrics={metrics}/>
+        <Dashboard layout={layout} widgets={widgets}/>
       </div>
     )
   }
@@ -36,8 +35,8 @@ class App extends Component {
 
 function mapStateToProps (state) {
   return {
-    collectors: state.collectors,
-    metrics: state.metrics
+    layout: state.layout,
+    widgets: state.widgets
   }
 }
 
