@@ -4,8 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: {
     'app': [
-      './web/static/js/app.js',
-      './web/static/css/app.scss'
+      './web/static/js/index.js'
     ]
   },
   output: {
@@ -23,6 +22,9 @@ module.exports = {
     }
   },
   module: {
+    preLoaders: [
+      { test: /\.js$/, loader: 'source-map-loader' },
+    ],
     loaders: [
     {
       test: /\.jsx?$/,
@@ -40,18 +42,8 @@ module.exports = {
           'css!sass?includePaths[]=' + __dirname + '/node_modules'
           )
     },
-    {
-      test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff'
-    },
-    {
-      test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream'
-    },
-    {
-      test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file'
-    },
-    {
-      test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml'
-    }
+    { test: /\.(png|jpg|jpeg|gif|svg)$/, loader: 'url-loader?prefix=img/&limit=5000' },
+    { test: /\.(woff|woff2|ttf|eot)$/, loader: 'url-loader?prefix=font/&limit=5000' },
     ]
   },
   plugins: [

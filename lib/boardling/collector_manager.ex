@@ -32,6 +32,10 @@ defmodule Boardling.CollectorManager do
     :ok = Quantum.deactivate_job(name)
   end
 
+  def run_now(name) do
+    CollectorChannel.broadcast_schedulation name
+  end
+
   def list_collectors do
     Enum.map(Quantum.jobs, fn (x) -> convert_job_to_external_format(x) end)
   end
