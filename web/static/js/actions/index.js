@@ -1,4 +1,5 @@
 import * as actionTypes from './actionTypes'
+import { Map as ImmutableMap } from 'immutable';
 
 export function startUp () {
   // this is the redux-middleware package in action, dispatch and getState params are passed in
@@ -16,7 +17,7 @@ function receiveCollectors(json) {
   // ]
   return {
     type: actionTypes.collectorsReceived,
-    collectors: new Map(
+    collectors: new ImmutableMap(
       json.collectors.map(
         (coll) => [coll.name, {schedule: coll.schedule, state: coll.state}]
       )
@@ -101,5 +102,24 @@ export function newMetricReceived(metricData) {
       dispatch(newWidget(metricName))
     }
     dispatch(newMetric(metricName, metricValue))
+  }
+}
+
+function newCollector(name, state, schedule) {
+  return {
+    type: actionTypes.newCollectorReceived,
+    collectorName: name,
+    collectorState: state,
+    collectorSchedule: schedule,
+  }
+}
+
+export function newCollectorReceived(collectorData) {
+  return (dispatch) => {
+    const collectorName = collectorData.name
+    const collectorState = collectorData.state
+    const collectorSchedule = collectorData.schedule
+
+    dispatch(newCollector(collectorName, collectorState, collectorSchedule))
   }
 }

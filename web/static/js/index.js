@@ -9,10 +9,11 @@ import createLogger from 'redux-logger'
 import App from './App'
 import rootReducer from './reducers'
 import { init as websocketInit, emit } from './actions/websocket'
+import { Map as ImmutableMap } from 'immutable';
 
 const initialState = {
-  metrics: Map(),
-  collectors: []
+  metrics: ImmutableMap(),
+  collectors: ImmutableMap()
 }
 
 function startUp () {

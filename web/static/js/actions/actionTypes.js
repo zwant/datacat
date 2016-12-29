@@ -8,5 +8,5 @@ export const collectorStateUpdated = 'collectorStateUpdated'
 
 export const websocketMessages = {
   newMetricMessage: 'new_metric',
-  collectorsRequested: 'request_collectors',
+  newCollectorMessage: 'new_collector',
 }

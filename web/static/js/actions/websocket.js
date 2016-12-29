@@ -1,6 +1,6 @@
 import { Socket } from 'phoenix'
 import * as actionTypes from './actionTypes'
-import { newMetricReceived } from '.'
+import { newMetricReceived, newCollectorReceived } from '.'
 
 const socket = new Socket("/widget_socket")
 let channel = null
@@ -15,6 +15,9 @@ const init = (store) => {
   // add listeners to socket messages so we can re-dispatch them as actions
   channel.on(actionTypes.websocketMessages.newMetricMessage, (payload) => {
     store.dispatch(newMetricReceived(payload))
+  })
+  channel.on(actionTypes.websocketMessages.newCollectorMessage, (payload) => {
+    store.dispatch(newCollectorReceived(payload))
   })
 }
 

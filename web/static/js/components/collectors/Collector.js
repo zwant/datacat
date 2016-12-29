@@ -7,7 +7,11 @@ export default Radium((props) => {
 
   return (
     <li>
-        <b>Name: {theName}</b>, <span onClick={onClick}>State: {theValue.state} </span>, Schedule: {theValue.schedule}
+        <div>
+          {theName}
+          <button onClick={onClick}> {theValue.state} </button>
+          Schedule: {theValue.schedule}
+        </div>
     </li>
   )
 })

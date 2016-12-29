@@ -1,5 +1,7 @@
 defmodule Boardling.CollectorManager do
   alias Boardling.CollectorChannel
+  alias Boardling.OutgoingMetricsChannel
+  alias Boardling.Collector
   require Logger
 
   def add_collector(name) do
@@ -12,6 +14,7 @@ defmodule Boardling.CollectorManager do
       :ok -> Logger.info "Added job with name [#{name}]"
     end
     Quantum.deactivate_job(name)
+    OutgoingMetricsChannel.broadcast_new_collector %Collector{name: name, schedule: default_schedule, state: "inactive"}
   end
 
   def update_collector_schedule(name, schedule) do
@@ -53,7 +56,7 @@ defmodule Boardling.CollectorManager do
   end
 
   defp convert_job_to_external_format({name, job}) do
-    %{name: name, schedule: job.schedule, state: job.state}
+    %Collector{name: name, schedule: job.schedule, state: job.state}
   end
 
 end
