@@ -18,10 +18,12 @@ export default Radium(connect(
   mapStateToProps
 )( (props) => {
   const { metricName, metrics } = props
-
+  console.log(metrics)
   return (
     <div style={styles.value}>
-      { metrics.get(metricName) }
+
     </div>
   )
 }))
+
+//{ metrics.get(metricName).currentValue }
