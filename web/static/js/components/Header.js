@@ -1,13 +1,10 @@
 import React from 'react';
+import CollectorList from './collectors/CollectorList'
 
 const Header = () => {
   return (
     <div className="top_nav">
-        <div className="nav_menu">
-            <nav className="dashboardHeader">
-                Hej
-            </nav>
-        </div>
+        <CollectorList />
     </div>
   );
 };

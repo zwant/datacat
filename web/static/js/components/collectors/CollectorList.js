@@ -1,20 +1,31 @@
-import React, { PropTypes } from 'react'
+import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import Collector from './Collector'
+import Radium from 'radium'
+import { toggleCollectorEnabled } from '../../actions'
 
-const CollectorList = ({collectors}) => (
-  <ul>
-    {Object.keys(collectors).map(collectorName =>
-      <Collector
-        key={collectorName}
-        theName={collectorName}
-      />
-    )}
-  </ul>
-)
-
-CollectorList.propTypes = {
-  collectors: PropTypes.object.isRequired
+function mapStateToProps (state) {
+  return {
+    collectors: state.collectors
+  }
 }
 
-export default CollectorList
+export default Radium(connect(
+  mapStateToProps
+)( (props) => {
+  const { collectors, dispatch } = props
+
+  return (
+    <div>
+    Collectors:
+      <ul>
+        {[...collectors].map(([name, value]) =>
+          <Collector key={name}
+                     theName={name}
+                     theValue={value}
+                     onClick={() => dispatch(toggleCollectorEnabled(name))}/>
+        )}
+      </ul>
+    </div>
+  )
+}))

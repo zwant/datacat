@@ -1,15 +1,13 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
+import Radium from 'radium'
 
-const Collector = ({theName}) => (
-  <div className="collector-entry">
-    <div className="collector-name"> { theName } </div>
-  </div>
-)
+export default Radium((props) => {
+  const { theName, theValue, onClick } = props
 
-Collector.propTypes = {
-  theName: PropTypes.string.isRequired,
-  theValue: PropTypes.number.isRequired
-}
-
-export default Collector
+  return (
+    <li>
+        <b>Name: {theName}</b>, <span onClick={onClick}>State: {theValue.state} </span>, Schedule: {theValue.schedule}
+    </li>
+  )
+})

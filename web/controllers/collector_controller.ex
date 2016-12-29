@@ -13,20 +13,20 @@ defmodule Boardling.CollectorController do
     CollectorManager.activate_collector(name)
     conn
       |> put_status(200)
-      |> json(%{ok: true})
+      |> json(%{state: "active"})
   end
 
   def deactivate(conn, %{"name" => name}) do
     CollectorManager.deactivate_collector(name)
     conn
       |> put_status(200)
-      |> json(%{ok: true})
+      |> json(%{state: "inactive"})
   end
 
   def list(conn, _params) do
     conn
       |> put_status(200)
-      |> json(CollectorManager.list_collectors)
+      |> json(%{collectors: CollectorManager.list_collectors})
   end
 
   def run_now(conn, %{"name" => name}) do

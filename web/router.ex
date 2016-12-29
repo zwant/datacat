@@ -26,7 +26,7 @@ defmodule Boardling.Router do
     get "/collectors/:name", CollectorController, :show
     post "/collectors/:name/run_now", CollectorController, :run_now
     put "/collectors/:name/schedule", CollectorController, :update_schedule
-    put "/collectors/:name/activate", CollectorController, :activate
-    put "/collectors/:name/deactivate", CollectorController, :deactivate
+    post "/collectors/:name/activate", CollectorController, :activate
+    post "/collectors/:name/deactivate", CollectorController, :deactivate
   end
 end
