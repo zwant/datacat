@@ -1,6 +1,6 @@
 from ws4py.client.threadedclient import WebSocketClient
 import json
-
+import time
 
 class Metric(object):
     name = None
@@ -12,7 +12,21 @@ class Metric(object):
     def __repr__(self):
         return "Metric[name: {}, value: {}]".format(self.name, self.value)
 
-class _CollectorClient(WebSocketClient):
+class ServerDisconnectedException(Exception):
+    pass
+
+class ReconnectingWebSocketClient(WebSocketClient):
+    def run_forever(self):
+        """
+        Simply blocks the thread until the
+        websocket has terminated.
+        """
+        while not self.terminated:
+            self._th.join(timeout=0.1)
+
+        raise ServerDisconnectedException()
+
+class _CollectorClient(ReconnectingWebSocketClient):
     topic = None
     collector_func = None # Needs to be set by creator
     collector_id = None
@@ -113,11 +127,16 @@ class BoardlingCollector(object):
 
     def run(self, collector_func):
         try:
-            ws = _CollectorClient(self.websocket_url,
-                                  self.collector_id,
-                                  collector_func,
-                                  protocols=['http-only', 'chat'])
-            ws.connect()
-            ws.run_forever()
+            while True:
+                ws = _CollectorClient(self.websocket_url,
+                                      self.collector_id,
+                                      collector_func,
+                                      protocols=['http-only', 'chat'])
+                try:
+                    ws.connect()
+                    ws.run_forever()
+                except (ServerDisconnectedException, ConnectionRefusedError):
+                    print("Server Disconnected, Retrying in 3 seconds")
+                    time.sleep(3)
         except KeyboardInterrupt:
             ws.close()
