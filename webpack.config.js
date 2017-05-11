@@ -46,6 +46,7 @@ module.exports = {
     { test: /\.(woff|woff2|ttf|eot)$/, loader: 'url-loader?prefix=font/&limit=5000' },
     ]
   },
+  devtool: 'inline-source-map',
   plugins: [
     new ExtractTextPlugin('css/app.css'),
     new CopyWebpackPlugin([

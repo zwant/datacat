@@ -2,6 +2,8 @@ defmodule Boardling.CollectorManager do
   alias Boardling.CollectorChannel
   alias Boardling.OutgoingMetricsChannel
   alias Boardling.Collector
+  alias Crontab
+  
   require Logger
 
   def add_collector(name) do
@@ -56,7 +58,7 @@ defmodule Boardling.CollectorManager do
   end
 
   defp convert_job_to_external_format({name, job}) do
-    %Collector{name: name, schedule: job.schedule, state: job.state}
+    %Collector{name: name, schedule: Crontab.CronExpression.Composer.compose(job.schedule), state: job.state}
   end
 
 end
